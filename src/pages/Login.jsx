@@ -21,8 +21,9 @@ export default function Login() {
       try {
         const res = await userAPI.getByEmail(form.email)
         user = res.data
-      } catch {
-        // Kalau tidak ada, buat user baru
+      } catch (lookupErr) {
+        // Hanya buat user baru kalau memang tidak ditemukan (404), bukan saat server error/mati
+        if (lookupErr.response?.status !== 404) throw lookupErr
         const res = await userAPI.create({
           email: form.email,
           nama: form.nama,
@@ -33,8 +34,8 @@ export default function Login() {
       }
       localStorage.setItem('scf_user', JSON.stringify(user))
       navigate('/dashboard')
-    } catch (err) {
-      setError('Terjadi kesalahan, coba lagi')
+    } catch {
+      setError('Tidak dapat terhubung ke server. Pastikan backend berjalan.')
     } finally {
       setLoading(false)
     }
@@ -54,16 +55,12 @@ export default function Login() {
         </p>
         <div className="mt-10 flex flex-col gap-4 w-full max-w-xs">
           <div className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-            <span className="text-xl">📷</span>
-            <span className="text-sm">Scan struk otomatis via OCR</span>
-          </div>
-          <div className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
             <span className="text-xl">📊</span>
             <span className="text-sm">Alokasi dana otomatis berjenjang</span>
           </div>
           <div className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-            <span className="text-xl">💬</span>
-            <span className="text-sm">Notifikasi WhatsApp real-time</span>
+            <span className="text-xl">👛</span>
+            <span className="text-sm">Banyak dompet, satu ringkasan</span>
           </div>
         </div>
       </div>
@@ -111,7 +108,7 @@ export default function Login() {
           </div>
 
           <p className="text-xs text-gray-400 text-center mt-6">
-            Data kamu aman dan terisolasi dari pengguna lain
+            Versi demo: belum ada password, jangan masukkan data keuangan sungguhan
           </p> 
         </div>
       </div>
