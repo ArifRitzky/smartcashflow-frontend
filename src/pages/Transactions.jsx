@@ -20,11 +20,7 @@ export default function Transactions() {
     keterangan: '',
   })
   const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    if (!user) { navigate('/login'); return }
-    fetchAll()
-  }, [])
+  const [error, setError] = useState('')
 
   const fetchAll = async () => {
     try {
@@ -42,9 +38,17 @@ export default function Transactions() {
     }
   }
 
+  useEffect(() => {
+    if (!user) { navigate('/login'); return }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleSave = async () => {
     if (!form.nominal || !form.walletId) return
     setSaving(true)
+    setError('')
     try {
       await transactionAPI.create({
         user: { userId: user.userId },
@@ -59,7 +63,7 @@ export default function Transactions() {
       setForm({ walletId: wallets[0]?.walletId || '', nominal: '', tipe: 'EXPENSE', tanggal: new Date().toISOString().split('T')[0], keterangan: '' })
       fetchAll()
     } catch (e) {
-      console.error(e)
+      setError(typeof e.response?.data === 'string' ? e.response.data : (e.response?.data?.message || 'Gagal menyimpan, periksa isian'))
     } finally {
       setSaving(false)
     }
@@ -223,6 +227,8 @@ export default function Transactions() {
                   onChange={e => setForm({...form, keterangan: e.target.value})}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
               </div>
+
+              {error && <p className="text-red-500 text-sm">{error}</p>}
 
               <button onClick={handleSave} disabled={saving}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl text-sm transition disabled:opacity-50">

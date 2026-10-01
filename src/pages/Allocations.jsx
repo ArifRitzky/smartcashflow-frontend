@@ -23,11 +23,6 @@ export default function Allocations() {
   })
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!user) { navigate('/login'); return }
-    fetchAll()
-  }, [])
-
   const fetchAll = async () => {
     try {
       const [r, w, d] = await Promise.all([
@@ -45,6 +40,13 @@ export default function Allocations() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!user) { navigate('/login'); return }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleSave = async () => {
     if (!form.namaPos || !form.walletId) {

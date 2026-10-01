@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const menuItems = [
   { label: 'Dashboard', icon: '📊', path: '/dashboard' },
@@ -14,7 +14,7 @@ export default function Sidebar() {
   const user = JSON.parse(localStorage.getItem('scf_user'))
   const location = useLocation()
     const currentPath = location.pathname
-  const [prefs, setPrefs] = useState(() => {
+  const [prefs] = useState(() => {
     return JSON.parse(localStorage.getItem('scf_prefs')) || {
       themeColor: '#1D9E75',
       bgType: 'DEFAULT',

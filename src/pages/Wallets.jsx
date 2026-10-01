@@ -11,16 +11,12 @@ export default function Wallets() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
   const [form, setForm] = useState({
     namaWallet: '',
     saldo: '',
     currency: 'IDR',
   })
-
-  useEffect(() => {
-    if (!user) { navigate('/login'); return }
-    fetchWallets()
-  }, [])
 
   const fetchWallets = async () => {
     try {
@@ -33,9 +29,17 @@ export default function Wallets() {
     }
   }
 
+  useEffect(() => {
+    if (!user) { navigate('/login'); return }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchWallets()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleSave = async () => {
     if (!form.namaWallet) return
     setSaving(true)
+    setError('')
     try {
       await walletAPI.create({
         user: { userId: user.userId },
@@ -48,7 +52,7 @@ export default function Wallets() {
       setForm({ namaWallet: '', saldo: '', currency: 'IDR' })
       fetchWallets()
     } catch (e) {
-      console.error(e)
+      setError(typeof e.response?.data === 'string' ? e.response.data : (e.response?.data?.message || 'Gagal menyimpan, periksa isian'))
     } finally {
       setSaving(false)
     }
@@ -82,16 +86,6 @@ export default function Wallets() {
     <div className="min-h-screen bg-gray-50 flex">
 
       <Sidebar />
-        <div className="mt-auto border-t border-gray-100 pt-3">
-          <div className="px-3 py-2">
-            <p className="text-sm font-medium text-gray-800">{user?.nama}</p>
-            <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-          </div>
-          <button onClick={() => { localStorage.removeItem('scf_user'); navigate('/login') }}
-            className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-xl transition">
-            🚪 Keluar
-          </button>
-        </div>
 
       {/* Main */}
       <div className="flex-1 p-6 overflow-auto">
@@ -208,6 +202,8 @@ export default function Wallets() {
                   <option value="SGD">SGD — Dollar Singapura</option>
                 </select>
               </div>
+
+              {error && <p className="text-red-500 text-sm">{error}</p>}
 
               <button onClick={handleSave} disabled={saving}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl text-sm transition disabled:opacity-50">

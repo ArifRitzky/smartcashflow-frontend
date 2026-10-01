@@ -13,11 +13,6 @@ export default function Dashboard() {
   const [deficits, setDeficits] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!user) { navigate('/login'); return }
-    fetchAll()
-  }, [])
-
   const fetchAll = async () => {
     try {
       const [w, t, d] = await Promise.all([
@@ -35,6 +30,13 @@ export default function Dashboard() {
     }
   }
 
+  useEffect(() => {
+    if (!user) { navigate('/login'); return }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const totalSaldo = wallets.reduce((sum, w) => sum + (w.saldo || 0), 0)
   const totalIncome = transactions.filter(t => t.tipe === 'INCOME').reduce((sum, t) => sum + t.nominal, 0)
   const totalExpense = transactions.filter(t => t.tipe === 'EXPENSE').reduce((sum, t) => sum + t.nominal, 0)
@@ -43,7 +45,7 @@ export default function Dashboard() {
     style: 'currency', currency: 'IDR', minimumFractionDigits: 0
   }).format(n)
 
-  const chartData = transactions
+  const chartData = [...transactions]
     .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
     .reduce((acc, t) => {
       const tgl = t.tanggal

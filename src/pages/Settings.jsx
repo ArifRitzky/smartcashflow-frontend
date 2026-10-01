@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 
 const ACCENT_COLORS = [
@@ -19,9 +18,6 @@ const GRADIENTS = [
 ]
 
 export default function Settings() {
-  const navigate = useNavigate()
-  const user = JSON.parse(localStorage.getItem('scf_user'))
-
   const savedPrefs = JSON.parse(localStorage.getItem('scf_prefs')) || {}
 
   const [themeColor, setThemeColor] = useState(savedPrefs.themeColor || '#1D9E75')
